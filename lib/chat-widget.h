@@ -179,6 +179,8 @@ protected Q_SLOTS:
 
     void chatViewReady();
 
+    void setTitle(const QString &title);
+
 Q_SIGNALS:
     /** Emitted whenever the title for the chat changes, normally the name of the contact or a topic*/
     void titleChanged(const QString &title);

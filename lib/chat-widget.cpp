@@ -1012,6 +1012,15 @@ void ChatWidget::chatViewReady()
     d->logsLoaded = true;
 }
 
+void ChatWidget::setTitle(const QString &title)
+{
+    if (d->title == title) {
+        return;
+    }
+    d->title = title;
+    d->ui.chatArea->setChatName(title);
+    emit titleChanged(title);
+}
 
 void ChatWidget::sendMessage()
 {
@@ -1155,7 +1164,7 @@ void ChatWidget::onContactAliasChanged(const Tp::ContactPtr & contact, const QSt
 
     //if in a non-group chat situation, and the other contact has changed alias...
     if (!d->isGroupChat && !isYou) {
-        Q_EMIT titleChanged(alias);
+        setTitle(alias);
     }
 }
 
@@ -1232,10 +1241,10 @@ void ChatWidget::onParticipantsChanged(Tp::Contacts groupMembersAdded,
                 newTitle.append(QLatin1String(" +")).append(QString::number(contactAliasList.size()-2));
             }
 
-            Q_EMIT titleChanged(newTitle);
+            setTitle(newTitle);
         }
         if (contactAliasList.count() == 0) {
-                Q_EMIT titleChanged(i18n("Group Chat"));
+            setTitle(i18n("Group Chat"));
         }
     }
 }
@@ -1434,8 +1443,7 @@ void ChatWidget::initChatArea()
     info.setServiceIconPath(KIconLoader::global()->iconPath(d->account->iconName(), -KIconLoader::SizeMedium));
     d->ui.chatArea->initialise(info);
 
-    //set the title of this chat.
-    d->title = info.chatName();
+    setTitle(info.chatName());
 }
 
 void ChatWidget::onChatPausedTimerExpired()
