@@ -61,6 +61,10 @@
 #include <TelepathyQt/PendingChannelRequest>
 #include <TelepathyQt/OutgoingFileTransferChannel>
 
+#if TP_QT_VERSION >= TP_QT_VERSION_CHECK(0, 9, 8)
+#include <TelepathyQt/Room>
+#endif
+
 #include <KTp/presence.h>
 #include <KTp/actions.h>
 #include <KTp/message-processor.h>
@@ -1408,6 +1412,12 @@ void ChatWidget::initChatArea()
         // gabble-created string "private-chat"
         if (d->channel->textChannel()->targetId().contains(QLatin1String("private-chat"))) {
             info.setChatName(i18n("Group Chat"));
+#if TP_QT_VERSION >= TP_QT_VERSION_CHECK(0, 9, 8)
+        } else if (!d->channel->textChannel()->targetRoom().isNull()) {
+            Tp::RoomPtr room = d->channel->textChannel()->targetRoom();
+            info.setChatName(room->title());
+            connect(room.data(), &Tp::Room::titleChanged, this, &ChatWidget::setTitle);
+#endif
         } else {
             QString roomName = d->channel->textChannel()->targetId();
             roomName = roomName.left(roomName.indexOf(QLatin1Char('@')));
