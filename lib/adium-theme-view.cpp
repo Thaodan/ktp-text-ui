@@ -304,6 +304,13 @@ ChatWindowStyle *AdiumThemeView::chatStyle() const
     return m_chatStyle;
 }
 
+void AdiumThemeView::setChatName(const QString &name)
+{
+    const QString js = QStringLiteral("var chatNameElement = document.querySelector(\"x-conversationWith\");\n"
+                                      "chatNameElement.innerHTML = \"%1\";").arg(name);
+    page()->runJavaScript(js);
+}
+
 void AdiumThemeView::setChatStyle(ChatWindowStyle *chatStyle)
 {
     m_chatStyle = chatStyle;
