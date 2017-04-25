@@ -120,6 +120,7 @@ public Q_SLOTS:
     void addAdiumContentMessage(const AdiumThemeContentInfo&);
     void addAdiumStatusMessage(const AdiumThemeStatusInfo&);
     void viewLoadFinished(bool ok);
+    void processDeliveryDetails(const Tp::ReceivedMessage::DeliveryDetails &details);
 
 protected:
     virtual void contextMenuEvent(QContextMenuEvent *event);

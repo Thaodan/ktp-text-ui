@@ -151,6 +151,29 @@ void AdiumThemeView::viewLoadFinished(bool ok)
     }
 }
 
+QString getDeliveryStatusText(Tp::DeliveryStatus status)
+{
+    switch (status) {
+    case Tp::DeliveryStatusDelivered:
+        return QStringLiteral("Delivered");
+    case Tp::DeliveryStatusAccepted:
+        return QStringLiteral("Accepted");
+    case Tp::DeliveryStatusRead:
+        return QStringLiteral("Read");
+    case Tp::DeliveryStatusDeleted:
+        return QStringLiteral("Deleted");
+    default:
+        return QStringLiteral("Unknown");
+    }
+}
+
+void AdiumThemeView::processDeliveryDetails(const Tp::ReceivedMessage::DeliveryDetails &details)
+{
+    const QString statusText = getDeliveryStatusText(details.status());
+    const QString js = QStringLiteral("setDeliveryStatus(\"%1\", \"%2\"); false").arg(details.originalToken(), statusText);
+    page()->runJavaScript(js);
+}
+
 void AdiumThemeView::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu *menu = new QMenu(this);
