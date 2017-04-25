@@ -171,6 +171,7 @@ void AdiumThemeView::processDeliveryDetails(const Tp::ReceivedMessage::DeliveryD
 {
     const QString statusText = getDeliveryStatusText(details.status());
     const QString js = QStringLiteral("setDeliveryStatus(\"%1\", \"%2\"); false").arg(details.originalToken(), statusText);
+    qWarning() << Q_FUNC_INFO << details.status() << js;
     page()->runJavaScript(js);
 }
 
@@ -438,7 +439,9 @@ void AdiumThemeView::addMessage(const KTp::Message &message)
         messageInfo.setMessage(message.finalizedMessage());
         messageInfo.setScript(message.finalizedScript());
 
+        qWarning() << "Set message token:" << message.token();
         messageInfo.setToken(message.token());
+
         messageInfo.setTime(message.time());
 
         if (message.property("highlight").toBool()) {
@@ -473,6 +476,8 @@ void AdiumThemeView::addAdiumContentMessage(const AdiumThemeContentInfo &content
 
     // contentMessage is const, we need a non-const one to append message classes
     AdiumThemeContentInfo message(contentMessage);
+
+    qWarning() << Q_FUNC_INFO << "111" << contentMessage.token() << message.token();
 
     // 2 consecutive messages can be combined when:
     //  * Sender is the same
@@ -645,6 +650,8 @@ void AdiumThemeView::appendMessage(QString &html, const QString &script, AppendM
                                             .replace(QLatin1Char('\n'), QLatin1String(""))); /* remove new lines    */
 
     page()->runJavaScript(js);
+
+    qWarning().noquote() << "Append message:" << html;
 
     if (!script.isEmpty()) {
         page()->runJavaScript(script);
