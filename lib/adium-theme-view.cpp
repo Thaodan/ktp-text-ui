@@ -415,6 +415,7 @@ void AdiumThemeView::addMessage(const KTp::Message &message)
         messageInfo.setMessage(message.finalizedMessage());
         messageInfo.setScript(message.finalizedScript());
 
+        messageInfo.setToken(message.token());
         messageInfo.setTime(message.time());
 
         if (message.property("highlight").toBool()) {
@@ -674,6 +675,8 @@ QString AdiumThemeView::replaceContentKeywords(QString& htmlTemplate, const Adiu
     htmlTemplate.replace(QLatin1String("%senderScreenName%"), info.senderScreenName());
     //sender
     htmlTemplate.replace(QLatin1String("%sender%"), info.sender());
+    //messageId
+    htmlTemplate.replace(QLatin1String("%messageToken%"), info.token());
     //senderColor
     htmlTemplate.replace(QLatin1String("%senderColor%"), info.senderColor());
     //senderStatusIcon
