@@ -90,6 +90,8 @@ public:
     void setVariant(const QString& variant);
     ChatWindowStyle* chatStyle() const;
 
+    void setChatName(const QString &name);
+
     /** Set the theme to use. Display will only change once initialise() is called.*/
     void setChatStyle(ChatWindowStyle *chatStyle);
     void setUseCustomFont(bool);

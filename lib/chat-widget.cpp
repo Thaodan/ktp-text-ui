@@ -61,6 +61,10 @@
 #include <TelepathyQt/PendingChannelRequest>
 #include <TelepathyQt/OutgoingFileTransferChannel>
 
+#if TP_QT_VERSION >= TP_QT_VERSION_CHECK(0, 9, 8)
+#include <TelepathyQt/Room>
+#endif
+
 #include <KTp/presence.h>
 #include <KTp/actions.h>
 #include <KTp/message-processor.h>
@@ -1012,6 +1016,15 @@ void ChatWidget::chatViewReady()
     d->logsLoaded = true;
 }
 
+void ChatWidget::setTitle(const QString &title)
+{
+    if (d->title == title) {
+        return;
+    }
+    d->title = title;
+    d->ui.chatArea->setChatName(title);
+    emit titleChanged(title);
+}
 
 void ChatWidget::sendMessage()
 {
@@ -1155,7 +1168,7 @@ void ChatWidget::onContactAliasChanged(const Tp::ContactPtr & contact, const QSt
 
     //if in a non-group chat situation, and the other contact has changed alias...
     if (!d->isGroupChat && !isYou) {
-        Q_EMIT titleChanged(alias);
+        setTitle(alias);
     }
 }
 
@@ -1232,10 +1245,10 @@ void ChatWidget::onParticipantsChanged(Tp::Contacts groupMembersAdded,
                 newTitle.append(QLatin1String(" +")).append(QString::number(contactAliasList.size()-2));
             }
 
-            Q_EMIT titleChanged(newTitle);
+            setTitle(newTitle);
         }
         if (contactAliasList.count() == 0) {
-                Q_EMIT titleChanged(i18n("Group Chat"));
+            setTitle(i18n("Group Chat"));
         }
     }
 }
@@ -1399,6 +1412,12 @@ void ChatWidget::initChatArea()
         // gabble-created string "private-chat"
         if (d->channel->textChannel()->targetId().contains(QLatin1String("private-chat"))) {
             info.setChatName(i18n("Group Chat"));
+#if TP_QT_VERSION >= TP_QT_VERSION_CHECK(0, 9, 8)
+        } else if (!d->channel->textChannel()->targetRoom().isNull()) {
+            Tp::RoomPtr room = d->channel->textChannel()->targetRoom();
+            info.setChatName(room->title());
+            connect(room.data(), &Tp::Room::titleChanged, this, &ChatWidget::setTitle);
+#endif
         } else {
             QString roomName = d->channel->textChannel()->targetId();
             roomName = roomName.left(roomName.indexOf(QLatin1Char('@')));
@@ -1434,8 +1453,7 @@ void ChatWidget::initChatArea()
     info.setServiceIconPath(KIconLoader::global()->iconPath(d->account->iconName(), -KIconLoader::SizeMedium));
     d->ui.chatArea->initialise(info);
 
-    //set the title of this chat.
-    d->title = info.chatName();
+    setTitle(info.chatName());
 }
 
 void ChatWidget::onChatPausedTimerExpired()
