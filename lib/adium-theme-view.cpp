@@ -153,6 +153,30 @@ void AdiumThemeView::viewLoadFinished(bool ok)
     }
 }
 
+QString getDeliveryStatusText(Tp::DeliveryStatus status)
+{
+    switch (status) {
+    case Tp::DeliveryStatusDelivered:
+        return QStringLiteral("Delivered");
+    case Tp::DeliveryStatusAccepted:
+        return QStringLiteral("Accepted");
+    case Tp::DeliveryStatusRead:
+        return QStringLiteral("Read");
+    case Tp::DeliveryStatusDeleted:
+        return QStringLiteral("Deleted");
+    default:
+        return QStringLiteral("Unknown");
+    }
+}
+
+void AdiumThemeView::processDeliveryDetails(const Tp::ReceivedMessage::DeliveryDetails &details)
+{
+    const QString statusText = getDeliveryStatusText(details.status());
+    const QString js = QStringLiteral("setDeliveryStatus(\"%1\", \"%2\"); false").arg(details.originalToken(), statusText);
+    qWarning() << Q_FUNC_INFO << details.status() << js;
+    page()->runJavaScript(js);
+}
+
 void AdiumThemeView::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu *menu = new QMenu(this);
@@ -424,6 +448,9 @@ void AdiumThemeView::addMessage(const KTp::Message &message)
         messageInfo.setMessage(message.finalizedMessage());
         messageInfo.setScript(message.finalizedScript());
 
+        qWarning() << "Set message token:" << message.token();
+        messageInfo.setToken(message.token());
+
         messageInfo.setTime(message.time());
 
         if (message.property("highlight").toBool()) {
@@ -458,6 +485,8 @@ void AdiumThemeView::addAdiumContentMessage(const AdiumThemeContentInfo &content
 
     // contentMessage is const, we need a non-const one to append message classes
     AdiumThemeContentInfo message(contentMessage);
+
+    qWarning() << Q_FUNC_INFO << "111" << contentMessage.token() << message.token();
 
     // 2 consecutive messages can be combined when:
     //  * Sender is the same
@@ -631,6 +660,8 @@ void AdiumThemeView::appendMessage(QString &html, const QString &script, AppendM
 
     page()->runJavaScript(js);
 
+    qWarning().noquote() << "Append message:" << html;
+
     if (!script.isEmpty()) {
         page()->runJavaScript(script);
     }
@@ -683,6 +714,8 @@ QString AdiumThemeView::replaceContentKeywords(QString& htmlTemplate, const Adiu
     htmlTemplate.replace(QLatin1String("%senderScreenName%"), info.senderScreenName());
     //sender
     htmlTemplate.replace(QLatin1String("%sender%"), info.sender());
+    //messageId
+    htmlTemplate.replace(QLatin1String("%messageToken%"), info.token());
     //senderColor
     htmlTemplate.replace(QLatin1String("%senderColor%"), info.senderColor());
     //senderStatusIcon

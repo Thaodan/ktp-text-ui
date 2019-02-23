@@ -963,8 +963,9 @@ void ChatWidget::handleIncomingMessage(const Tp::ReceivedMessage &message, bool 
                 }
             } else {
                 //TODO: handle delivery reports properly
-                qCWarning(KTP_TEXTUI_LIB) << "Ignoring delivery report";
+                qCWarning(KTP_TEXTUI_LIB) << "Process delivery report";
                 d->channel->acknowledge(QList<Tp::ReceivedMessage>() << message);
+                d->ui.chatArea->processDeliveryDetails(message.deliveryDetails());
                 return;
             }
 

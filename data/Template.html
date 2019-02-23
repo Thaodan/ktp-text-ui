@@ -137,6 +137,19 @@
                 self.coalesce();
             }
 
+            this.setDeliveryStatus = function(messageToken, status) {
+                var messageNode = document.getElementById(messageToken)
+                if (!messageNode) {
+                    return false;
+                }
+                var deliveryNode = messageNode.querySelector('.x-deliveryStatus')
+                if (!deliveryNode) {
+                    return false;
+                }
+                deliveryNode.innerHTML = status;
+                return true;
+            }
+
             this.replaceLast = function (html, shouldScroll) {
                 rmInsertNode();
                 var node = createHTMLNode(html);
@@ -149,6 +162,10 @@
         var coalescedHTML;
 
         //Appending new content to the message view
+        function setDeliveryStatus(messageToken, status) {
+            return coalescedHTML.setDeliveryStatus("message-" + messageToken, status);
+        }
+
         function appendMessage(html) {
             var shouldScroll;
 
